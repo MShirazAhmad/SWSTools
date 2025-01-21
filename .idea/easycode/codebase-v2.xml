@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="com.obiscr.chatgpt.settings.EasyCodeState">
+    <option name="projectFiles" value="$PROJECT_DIR$/NanoAnalyst/forms.py;/Users/shiraz/PycharmProjects/SWSTools/NanoAnalyst/models.py;/Users/shiraz/PycharmProjects/SWSTools/NanoAnalyst/urls.py;/Users/shiraz/PycharmProjects/SWSTools/NanoAnalyst/views.py;/Users/shiraz/PycharmProjects/SWSTools/SWSTools/__init__.py;/Users/shiraz/PycharmProjects/SWSTools/SWSTools/asgi.py;/Users/shiraz/PycharmProjects/SWSTools/SWSTools/settings.py;/Users/shiraz/PycharmProjects/SWSTools/SWSTools/urls.py;/Users/shiraz/PycharmProjects/SWSTools/SWSTools/wsgi.py;/Users/shiraz/PycharmProjects/SWSTools/templates/accounts/loggedout.html;/Users/shiraz/PycharmProjects/SWSTools/templates/accounts/login.html;/Users/shiraz/PycharmProjects/SWSTools/templates/accounts/registration.html;/Users/shiraz/PycharmProjects/SWSTools/templates/NanoAnalyst/base.html;/Users/shiraz/PycharmProjects/SWSTools/manage.py" />
+  </component>
+</project>

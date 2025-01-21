@@ -1,0 +1,86 @@
+<!-- templates/uploader/dashboard.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Plot Generator{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Welcome, {{ user.username }}!</h2>
+            <hr>
+            <h3>Your Uploaded Files and Generated Plots</h3>
+            
+            {% if uploaded_files %}
+                <div class="table-responsive mt-4">
+                    <table id="uploadedFilesTable" class="table table-striped table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>#</th>
+                                <th>File Name</th>
+                                <th>Uploaded At</th>
+                                <th>Generated Plots</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for file in uploaded_files %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>{{ file.file.name|slice:"8:" }}</td> <!-- Removes 'uploads/' prefix -->
+                                    <td>{{ file.uploaded_at|date:"F j, Y, g:i a" }}</td>
+                                    <td>
+                                        {% if file.generated_plots.all %}
+                                            <div class="d-flex flex-wrap">
+                                                {% for plot in file.generated_plots.all %}
+                                                    <div class="me-3 mb-3 text-center">
+                                                        <a href="{{ plot.plot.url }}" target="_blank">
+                                                            <img src="{{ plot.plot.url }}" alt="Plot {{ forloop.counter }}" class="img-thumbnail" style="width: 150px; height: auto;">
+                                                        </a>
+                                                        <a href="{{ plot.plot.url }}" download="plot_{{ file.id }}_{{ forloop.counter }}.png" class="btn btn-sm btn-success mt-2">Download</a>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <span class="badge bg-secondary">No plots generated</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ file.file.url }}" download="{{ file.file.name }}" class="btn btn-sm btn-primary">Download File</a>
+                                        <!-- Optional: Add a delete button or other actions here -->
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info mt-4" role="alert">
+                    You have not uploaded any files yet. <a href="{% url 'file-upload' %}" class="alert-link">Upload a file</a> to get started.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        $(document).ready(function() {
+            $('#uploadedFilesTable').DataTable({
+                "order": [[ 2, "desc" ]], // Orders the table by 'Uploaded At' descending
+                "columnDefs": [
+                    { "orderable": false, "targets": [3,4] } // Disables ordering on 'Generated Plots' and 'Actions' columns
+                ],
+                "language": {
+                    "search": "Filter records:",
+                    "lengthMenu": "Show _MENU_ entries",
+                    "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                    "paginate": {
+                        "previous": "Previous",
+                        "next": "Next"
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
