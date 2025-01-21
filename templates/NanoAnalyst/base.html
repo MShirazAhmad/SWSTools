@@ -1,0 +1,162 @@
+<!-- templates/uploader/upload.html -->
+{% extends 'base.html' %}
+
+{% block title %}NanoAnalyst{% endblock %}
+
+{% block content %}
+{##}
+{#    <!-- Navigation Bar -->#}
+{#    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">#}
+{#        <a class="navbar-brand" href="{% url 'file-upload' %}">Plot Generator</a>#}
+{#        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" #}
+{#                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">#}
+{#            <span class="navbar-toggler-icon"></span>#}
+{#        </button>#}
+{#        <div class="collapse navbar-collapse" id="navbarNav">#}
+{#            <ul class="navbar-nav ml-auto">#}
+{#                {% if user.is_authenticated %}#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>#}
+{#                    </li>#}
+{#                {% else %}#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'login' %}">Login</a>#}
+{#                    </li>#}
+{#                    <li class="nav-item">#}
+{#                        <a class="nav-link" href="{% url 'register' %}">Register</a>#}
+{#                    </li>#}
+{#                {% endif %}#}
+{#            </ul>#}
+{#        </div>#}
+{#    </nav>#}
+
+    <div class="container">
+        <h1 class="text-center">Excel Plot Generator</h1>
+        <form method="post" enctype="multipart/form-data" class="mt-4">
+            {% csrf_token %}
+
+            <div class="form-group">
+                {{ form.file.label_tag }}
+                {{ form.file }}
+            </div>
+            
+            <!-- Plot 1 Range Inputs -->
+            <div class="range-section">
+                <h5>Plot 1: Load vs Hardness Across Sheets</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.plot1_xmin.label_tag }}
+                        {{ form.plot1_xmin }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.plot1_xmax.label_tag }}
+                        {{ form.plot1_xmax }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.plot1_ymin.label_tag }}
+                        {{ form.plot1_ymin }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.plot1_ymax.label_tag }}
+                        {{ form.plot1_ymax }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Plot 2 Range Inputs -->
+            <div class="range-section">
+                <h5>Plot 2: Average Displacement vs Hardness with Standard Deviation Shading</h5>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.plot2_xmin.label_tag }}
+                        {{ form.plot2_xmin }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.plot2_xmax.label_tag }}
+                        {{ form.plot2_xmax }}
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        {{ form.plot2_ymin.label_tag }}
+                        {{ form.plot2_ymin }}
+                    </div>
+                    <div class="form-group col-md-6">
+                        {{ form.plot2_ymax.label_tag }}
+                        {{ form.plot2_ymax }}
+                    </div>
+                </div>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Upload and Generate Plots</button>
+        </form>
+
+        {% if form.errors %}
+            <div class="alert alert-danger mt-3">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        {% if plot1 and plot2 %}
+            <div class="plot">
+                <h3>Load vs Hardness Across Sheets</h3>
+                {% if plot1_ranges.xmin or plot1_ranges.xmax or plot1_ranges.ymin or plot1_ranges.ymax %}
+                    <p><strong>Plot 1 Ranges:</strong></p>
+                    <ul>
+                        {% if plot1_ranges.xmin %}
+                            <li>X-axis Minimum: {{ plot1_ranges.xmin }}</li>
+                        {% endif %}
+                        {% if plot1_ranges.xmax %}
+                            <li>X-axis Maximum: {{ plot1_ranges.xmax }}</li>
+                        {% endif %}
+                        {% if plot1_ranges.ymin %}
+                            <li>Y-axis Minimum: {{ plot1_ranges.ymin }}</li>
+                        {% endif %}
+                        {% if plot1_ranges.ymax %}
+                            <li>Y-axis Maximum: {{ plot1_ranges.ymax }}</li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+                <img src="data:image/png;base64,{{ plot1 }}" class="img-fluid" alt="Plot 1">
+                <a href="{{ plot1_url }}" download="plot1.png" class="btn btn-success mt-2">Download Plot 1</a>
+            </div>
+
+            <div class="plot">
+                <h3>Average Displacement vs Hardness with Standard Deviation Shading</h3>
+                {% if plot2_ranges.xmin or plot2_ranges.xmax or plot2_ranges.ymin or plot2_ranges.ymax %}
+                    <p><strong>Plot 2 Ranges:</strong></p>
+                    <ul>
+                        {% if plot2_ranges.xmin %}
+                            <li>X-axis Minimum: {{ plot2_ranges.xmin }}</li>
+                        {% endif %}
+                        {% if plot2_ranges.xmax %}
+                            <li>X-axis Maximum: {{ plot2_ranges.xmax }}</li>
+                        {% endif %}
+                        {% if plot2_ranges.ymin %}
+                            <li>Y-axis Minimum: {{ plot2_ranges.ymin }}</li>
+                        {% endif %}
+                        {% if plot2_ranges.ymax %}
+                            <li>Y-axis Maximum: {{ plot2_ranges.ymax }}</li>
+                        {% endif %}
+                    </ul>
+                {% endif %}
+                <img src="data:image/png;base64,{{ plot2 }}" class="img-fluid" alt="Plot 2">
+                <a href="{{ plot2_url }}" download="plot2.png" class="btn btn-success mt-2">Download Plot 2</a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

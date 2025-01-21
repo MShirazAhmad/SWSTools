@@ -1,0 +1,54 @@
+<!-- uploader/templates/uploader/select_axes.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Select Axes for Plotting{% endblock %}
+
+{% block content %}
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h2 class="mb-4">Select Axes for Plotting</h2>
+            <form method="post" id="axesForm">
+                {% csrf_token %}
+                <div class="mb-3">
+                    {{ form.x_axis.label_tag }}
+                    {{ form.x_axis }}
+                </div>
+                <div class="mb-3">
+                    {{ form.y_axis.label_tag }}
+                    {{ form.y_axis }}
+                </div>
+                <button type="submit" class="btn btn-success">Generate Plots</button>
+                <div id="loadingSpinner" class="spinner-border text-success ms-3" role="status" style="display: none;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </form>
+            
+            <!-- Display Form Errors -->
+            {% if form.errors %}
+                <div class="alert alert-danger mt-3">
+                    <ul>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        $(document).ready(function() {
+            $('#axesForm').on('submit', function() {
+                $('#loadingSpinner').show();
+            });
+        });
+    </script>
+{% endblock %}

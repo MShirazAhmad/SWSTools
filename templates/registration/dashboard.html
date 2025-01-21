@@ -1,0 +1,90 @@
+<!-- uploader/templates/uploader/dashboard.html -->
+
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - Plot Generator{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2 class="mb-4">Dashboard</h2>
+        <hr>
+        <h4>Your Uploaded Files and Generated Plots</h4>
+
+        {% if page_obj.object_list %}
+            {% for file in page_obj.object_list %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <strong>File:</strong> {{ file.file.name|slice:"8:" }} <!-- Adjust slice as needed to remove 'uploads/' prefix -->
+                        <span class="float-end"><strong>Uploaded At:</strong> {{ file.uploaded_at|date:"F j, Y, g:i a" }}</span>
+                    </div>
+                    <div class="card-body">
+                        {% if file.generated_plots.all %}
+                            <h5>Generated Plots:</h5>
+                            <div class="row">
+                                {% for plot in file.generated_plots.all %}
+                                    <div class="col-md-6 col-lg-4 mb-4">
+                                        <div class="card h-100">
+                                            <img src="{{ plot.plot_image.url }}" class="card-img-top" alt="Plot {{ forloop.counter }}">
+                                            <div class="card-body">
+                                                <h5 class="card-title">{{ plot.y_axis }} vs {{ plot.x_axis }}</h5>
+                                                <p class="card-text"><strong>Sheet:</strong> {{ plot.plot_image.name|slice:"6:-4:" }}</p> <!-- Adjust slice based on file naming -->
+                                                <a href="{{ plot.plot_image.url }}" download="{{ plot.plot_image.name }}" class="btn btn-success">Download Plot</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <p><span class="badge bg-secondary">No plots generated from this file.</span></p>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+
+            <!-- Pagination Controls -->
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ num }}</a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        {% else %}
+            <div class="alert alert-info mt-4" role="alert">
+                You have not uploaded any files yet. <a href="{% url 'file-upload' %}" class="alert-link">Upload a file</a> to get started.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

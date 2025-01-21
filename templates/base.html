@@ -1,0 +1,180 @@
+<!-- templates/base.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Research Dashboard{% endblock %}</title>
+
+    <!-- jQuery (loaded only once) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+
+    <!-- Bootstrap CSS (Latest version) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- DataTables JS -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+
+    <!-- Bootstrap Bundle with Popper (needed for components like dropdowns, modals, etc.) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block extra_head %}
+    <!-- Additional head elements can be added by extending templates -->
+    {% endblock %}
+
+    <!-- Custom Styles -->
+    <style>
+        /* Adjust body padding to prevent content from being hidden behind the fixed navbar */
+        body {
+            padding-top: 70px;
+            background-color: #f4f6f9;
+        }
+
+        /* Custom Navbar Styles */
+        .navbar-brand {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #007bff !important;
+        }
+
+        .nav-link {
+            color: #555 !important;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #007bff !important;
+        }
+
+        .nav-link.active {
+            color: #007bff !important;
+            font-weight: 600;
+        }
+
+        /* Content Container */
+        .container {
+            max-width: 1200px;
+        }
+
+        /* Plot Sections */
+        .plot {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .plot h3 {
+            margin-bottom: 20px;
+            color: #333333;
+        }
+
+        .plot img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+
+        .plot a.btn {
+            margin-top: 15px;
+        }
+
+        /* Form Sections */
+        .range-section {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            background-color: #e9ecef;
+        }
+
+        .range-section h5 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 50px;
+            padding: 20px 0;
+            background-color: #343a40;
+            color: #ffffff;
+            text-align: center;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.25rem;
+            }
+
+            .plot {
+                padding: 15px;
+            }
+
+            .range-section {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'file-upload' %}">Research Dashboard</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Authentication Links -->
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'file-upload' %}active{% endif %}" href="{% url 'file-upload' %}">Upload File</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}" href="{% url 'register' %}">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Login</a>
+                        </li>
+                    {% endif %}
+                    
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Content Block -->
+        <div class="container mt-5 pt-4">
+            {% block content %}
+            <!-- Content from extending templates will be injected here -->
+            {% endblock %}
+        </div>
+
+        <!-- Optional: Add custom JavaScript or additional functionality -->
+        {% block extra_js %}
+        <!-- Additional JavaScript can be added by extending templates -->
+        {% endblock %}
+
+        <!-- Footer -->
+        <footer class="bg-dark text-white mt-5">
+            <div class="container py-3">
+                <p class="mb-0">&copy; {{ current_year }} Research Dashboard. All rights reserved.</p>
+            </div>
+        </footer>
+    </body>
+</html>
