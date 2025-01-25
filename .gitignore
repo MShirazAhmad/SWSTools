@@ -5,6 +5,6 @@
 /media/
 
 # Ignore settings.py in SWSTools directory
-/SWSTools/settings.py
+#/SWSTools/settings.py
 
 NanoAnalyst/__pycache__/
