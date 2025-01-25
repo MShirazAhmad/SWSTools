@@ -1,2 +1,8 @@
-!/db.sqlite3
-!/media/
+# Ignore db.sqlite3
+/db.sqlite3
+
+# Ignore the media directory
+/media/
+
+# Ignore settings.py in SWSTools directory
+/SWSTools/settings.py
