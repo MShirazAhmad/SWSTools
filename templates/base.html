@@ -16,45 +16,57 @@
     {% endblock %}
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'file-upload' %}">
-                <img src="{% static 'logo.png' %}" alt="Logo" width="100" height="auto" class="mb-3 ml-0 img-fluid" onerror="this.style.display='none';">
-{#                Research Dashboard#}
-            </a>
-                <!-- Centered Navbar Title -->
+ <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top shadow-sm">
+    <div class="container-fluid">
+        <!-- Brand/Logo -->
+        <a class="navbar-brand" href="{% url 'file-upload' %}">
+            <img src="{% static 'logo.png' %}" alt="Logo" width="100" height="auto" class="mb-3 ml-0 img-fluid" onerror="this.style.display='none';">
+        </a>
+
         <!-- Centered Navbar Title -->
         <div class="navbar-text mx-auto d-none d-lg-block flex-grow-1 text-center">
             <h4 class="mb-0">{% block navbar_title %}{% endblock %}</h4>
         </div>
-        
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    {% if user.is_authenticated %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
-                        </li>
-                    {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'file-upload' %}active{% endif %}" href="{% url 'file-upload' %}">Upload File</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}" href="{% url 'register' %}">Register</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Login</a>
-                        </li>
-                    {% endif %}
-                </ul>
-            </div>
+
+        <!-- Navbar Toggler for Mobile -->
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <!-- Navbar Links -->
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                {% if user.is_authenticated %}
+                    <!-- Dashboard Link -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}">Dashboard</a>
+                    </li>
+                    <!-- Advanced Plot Link -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'advanced_plot' %}active{% endif %}" href="{% url 'advanced_plot' %}">Advanced Plot</a>
+                    </li>
+                    <!-- Logout Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                {% else %}
+                    <!-- Upload File Link -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'file-upload' %}active{% endif %}" href="{% url 'file-upload' %}">Upload File</a>
+                    </li>
+                    <!-- Register Link -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'register' %}active{% endif %}" href="{% url 'register' %}">Register</a>
+                    </li>
+                    <!-- Login Link -->
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.resolver_match.url_name == 'login' %}active{% endif %}" href="{% url 'login' %}">Login</a>
+                    </li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
+    </div>
+</nav>
 
     <div class="container mt-5 pt-4">
         {% block content %}
@@ -67,7 +79,7 @@
         <div class="row">
             <div class="col-12 text-center">
                 <p class="mb-0">
-                    &copy; {% now "Y" %} Research Dashboard. Made with ❤️ by 
+                    &copy; {% now "Y" %} Research Dashboard. Made with ❤️ by
                     <a href="javascript:void(0);" class="text-white text-decoration-none">Muhammad Shiraz Ahmad</a>.
                 </p>
             </div>

@@ -454,3 +454,156 @@ def axes_selection_view(request, file_id):
         # Initialize the form with the extracted headers
         form = AxesSelectionForm(headers=unique_headers)
         return render(request, 'NanoAnalyst/select-axis.html', {'form': form, 'file': uploaded_file})
+
+
+@method_decorator(login_required, name='dispatch')
+class AdvancedPlotView(View):
+    template_name = 'NanoAnalyst/advanced_plot.html'
+
+    def get(self, request):
+        # Define the list of column names manually
+        column_names = [
+            'Displacement Into Surface (nm)',
+            'Load On Sample (mN)',
+            'Time On Sample (s)',
+            'Harmonic Contact Stiffness (N/m)',
+            'Hardness (GPa)',
+            'Modulus (GPa)',
+        ]
+        # Render the form with the column names
+        return render(request, self.template_name, {'column_names': column_names})
+
+    def post(self, request):
+        # Get the uploaded file
+        uploaded_file = request.FILES.get('file')
+        if not uploaded_file:
+            return render(request, self.template_name, {'error': 'Please upload a file.'})
+
+        # Define the list of column names manually
+        column_names = [
+            'Displacement Into Surface (nm)',
+            'Load On Sample (mN)',
+            'Time On Sample (s)',
+            'Harmonic Contact Stiffness (N/m)',
+            'Hardness (GPa)',
+            'Modulus (GPa)',
+        ]
+
+        # Get user inputs
+        x_axis_column = request.POST.get('x_axis_column')
+        y_axis_column = request.POST.get('y_axis_column')
+        plot_title = request.POST.get('plot_title', '')
+        x_axis_label = request.POST.get('x_axis_label', '')
+        y_axis_label = request.POST.get('y_axis_label', '')
+
+        # Get optional axis ranges
+        x_min = request.POST.get('x_min')
+        x_max = request.POST.get('x_max')
+        y_min = request.POST.get('y_min')
+        y_max = request.POST.get('y_max')
+
+        # Validate x and y axis columns
+        if not x_axis_column or not y_axis_column:
+            return render(request, self.template_name, {
+                'error': 'Please select both x and y axis columns.',
+                'column_names': column_names,
+            })
+
+        # Generate sheet names
+        sheet_names = [f"Test {str(i).zfill(3)}" for i in range(0, 21)]
+
+        # Initialize an empty DataFrame
+        combined_df = pd.DataFrame()
+
+        test_numbers = np.array([int(s.split()[-1]) for s in sheet_names])
+
+        # Loop through sheets and process
+        for i, sheet_name in zip(test_numbers, sheet_names):
+            try:
+                # Load the current sheet as strings
+                df_loaded = pd.read_excel(uploaded_file, sheet_name=sheet_name, dtype=str, engine='xlrd')
+
+                # Rename columns
+                df_loaded.columns = [
+                    'Segment',
+                    f'Displacement Into Surface (nm) - {i}',
+                    f'Load On Sample (mN) - {i}',
+                    f'Time On Sample (s) - {i}',
+                    f'Harmonic Contact Stiffness (N/m) - {i}',
+                    f'Hardness (GPa) - {i}',
+                    f'Modulus (GPa) - {i}'
+                ]
+
+                # Retain only the renamed columns (excluding 'Segment' for consistency)
+                df_loaded = df_loaded.drop(columns=['Segment'])
+
+                # Combine with the main DataFrame
+                if combined_df.empty:
+                    combined_df = df_loaded
+                else:
+                    combined_df = pd.concat([combined_df, df_loaded], axis=1)
+            except:
+                pass
+
+        # Extract all x and y columns
+        x_columns = [col for col in combined_df.columns if x_axis_column in col]
+        y_columns = [col for col in combined_df.columns if y_axis_column in col]
+
+        # Generate the combined plot
+        plt.figure(figsize=(10, 6))
+        for x_col, y_col in zip(x_columns, y_columns):
+            try:
+                # Convert to numeric, skipping invalid entries
+                x_data = pd.to_numeric(combined_df[x_col], errors='coerce')
+                y_data = pd.to_numeric(combined_df[y_col], errors='coerce')
+
+                # Plot valid data
+                plt.plot(x_data, y_data, label=f"{x_col.split('-')[-1].strip()}")
+            except:
+                pass
+
+        # Calculate mean and standard deviation
+        mean_y_data = np.mean([pd.to_numeric(combined_df[y_col], errors='coerce') for y_col in y_columns], axis=0)
+        std_y_data = np.std([pd.to_numeric(combined_df[y_col], errors='coerce') for y_col in y_columns], axis=0)
+
+        # Plot mean with standard deviation
+        plt.plot(pd.to_numeric(combined_df[x_columns[0]], errors='coerce'), mean_y_data, label='Mean', color='black')
+        plt.fill_between(pd.to_numeric(combined_df[x_columns[0]], errors='coerce'), mean_y_data - std_y_data, mean_y_data + std_y_data, alpha=0.6, label='Standard Deviation')
+
+        # Customize the plot
+        plt.title(plot_title or f"{x_axis_column} vs {y_axis_column}", fontsize=14)
+        plt.xlabel(x_axis_label or x_axis_column, fontsize=12)
+        plt.ylabel(y_axis_label or y_axis_column, fontsize=12)
+        plt.legend(title="Test Number", loc="best")
+        plt.grid(True)
+        plt.tight_layout()
+
+        # Apply optional axis ranges
+        if x_min and x_max:
+            plt.xlim(float(x_min), float(x_max))
+        if y_min and y_max:
+            plt.ylim(float(y_min), float(y_max))
+
+        # Save the plot to a BytesIO object
+        buf = io.BytesIO()
+        plt.savefig(buf, format='png')
+        buf.seek(0)
+        plot_base64 = base64.b64encode(buf.read()).decode('utf-8')
+        plt.close()
+
+        # Render the template with the combined plot and form data
+        return render(request, self.template_name, {
+            'plot': plot_base64,
+            'column_names': column_names,
+            'form_data': {
+                'x_axis_column': x_axis_column,
+                'y_axis_column': y_axis_column,
+                'plot_title': plot_title,
+                'x_axis_label': x_axis_label,
+                'y_axis_label': y_axis_label,
+                'x_min': x_min,
+                'x_max': x_max,
+                'y_min': y_min,
+                'y_max': y_max,
+            },
+        })

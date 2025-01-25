@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{#{% block title %}Advanced Plot{% endblock %}#}
+{% block navbar_title %}MTS Nanoindenter XLS File Plotter (Advanced){% endblock %}
+
+{% block content %}
+    <div class="container my-5">
+{#        <h1 class="text-center mb-4">Advanced Plot Generator</h1>#}
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    
+                    <!-- File Upload -->
+                    <div class="mb-3">
+                        <label for="file" class="form-label">Upload Excel File:</label>
+                        <input type="file" name="file" class="form-control" required>
+                    </div>
+
+                    <!-- Inline Columns Selection -->
+                    <div class="row mb-3">
+                        <!-- X-Axis Column Dropdown -->
+                        <div class="col-md-6">
+                            <label for="x_axis_column" class="form-label">X-Axis Column:</label>
+                            <select name="x_axis_column" class="form-select" required>
+                                <option value="">-- Select X-Axis Column --</option>
+                                {% for column in column_names %}
+                                    <option value="{{ column }}" {% if form_data.x_axis_column == column %}selected{% endif %}>
+                                        {{ column }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Y-Axis Column Dropdown -->
+                        <div class="col-md-6">
+                            <label for="y_axis_column" class="form-label">Y-Axis Column:</label>
+                            <select name="y_axis_column" class="form-select" required>
+                                <option value="">-- Select Y-Axis Column --</option>
+                                {% for column in column_names %}
+                                    <option value="{{ column }}" {% if form_data.y_axis_column == column %}selected{% endif %}>
+                                        {{ column }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Plot Title -->
+                    <div class="mb-3">
+                        <label for="plot_title" class="form-label">Plot Title (Optional):</label>
+                        <input type="text" name="plot_title" class="form-control" placeholder="e.g., Displacement vs Modulus" value="{{ form_data.plot_title }}">
+                    </div>
+
+                
+                         <div class="row mb-3">
+                    <!-- X-Axis Label -->
+                    <div class="col-md-6">
+                        <label for="x_axis_label" class="form-label">X-Axis Label (Optional):</label>
+                        <input type="text" name="x_axis_label" class="form-control" placeholder="e.g., Displacement (nm)" value="{{ form_data.x_axis_label }}">
+                    </div>
+
+                    <!-- Y-Axis Label -->
+                    <div class="col-md-6">
+                        <label for="y_axis_label" class="form-label">Y-Axis Label (Optional):</label>
+                        <input type="text" name="y_axis_label" class="form-control" placeholder="e.g., Modulus (GPa)" value="{{ form_data.y_axis_label }}">
+                    </div>
+                         </div>
+                    <!-- X-Axis Range -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="x_min" class="form-label">X-Axis Minimum (Optional):</label>
+                            <input type="number" name="x_min" class="form-control" placeholder="e.g., 0" value="{{ form_data.x_min }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="x_max" class="form-label">X-Axis Maximum (Optional):</label>
+                            <input type="number" name="x_max" class="form-control" placeholder="e.g., 100" value="{{ form_data.x_max }}">
+                        </div>
+                    </div>
+
+                    <!-- Y-Axis Range -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="y_min" class="form-label">Y-Axis Minimum (Optional):</label>
+                            <input type="number" name="y_min" class="form-control" placeholder="e.g., 0" value="{{ form_data.y_min }}">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="y_max" class="form-label">Y-Axis Maximum (Optional):</label>
+                            <input type="number" name="y_max" class="form-control" placeholder="e.g., 50" value="{{ form_data.y_max }}">
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg">Generate Plot</button>
+                    </div>
+                </form>
+
+                <!-- Error Message -->
+                {% if error %}
+                    <div class="alert alert-danger mt-4">{{ error }}</div>
+                {% endif %}
+
+                <!-- Plot Display -->
+                {% if plot %}
+                    <div class="mt-4">
+                        <h5 class="text-center">Combined Plot</h5>
+                        <img src="data:image/png;base64,{{ plot }}" class="img-fluid rounded" alt="Combined Plot">
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
